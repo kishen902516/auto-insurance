@@ -1,0 +1,115 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['motor-my-api/**']
+  pull_request:
+    branches: [main]
+    paths: ['motor-my-api/**']
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: motor_insurance_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: motor-my-api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: motor-my-api
+        run: npm ci
+
+      - name: Generate Prisma client
+        working-directory: motor-my-api
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/motor_insurance_test
+
+      - name: Run database migrations
+        working-directory: motor-my-api
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/motor_insurance_test
+
+      - name: Lint
+        working-directory: motor-my-api
+        run: npm run lint
+
+      - name: Type check
+        working-directory: motor-my-api
+        run: npm run typecheck
+
+      - name: Run tests
+        working-directory: motor-my-api
+        run: npm test
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/motor_insurance_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret
+
+      - name: Build
+        working-directory: motor-my-api
+        run: npm run build
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/develop'
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    environment: development
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy to development
+        run: |
+          echo "Would deploy backend to development environment"
+          # Add actual deployment commands here (Fly.io or AWS)
+          
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy to production
+        run: |
+          echo "Would deploy backend to production environment"
+          # Add actual deployment commands here (Fly.io or AWS)
