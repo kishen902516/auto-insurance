@@ -36,7 +36,7 @@ export function AppShell({ children }: AppShellProps) {
                 onClick={toggleLanguage}
                 className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                 aria-label={t('common.changeLanguage')}
-                aria-current={language}
+                aria-pressed={language === 'en' ? 'true' : 'false'}
               >
                 {language === 'en' ? 'BM' : 'EN'}
               </button>
