@@ -8,6 +8,58 @@ interface AppShellProps {
   children: React.ReactNode;
 }
 
+// Common CSS classes for consistent focus styles
+const FOCUS_CLASSES = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500';
+const FOOTER_LINK_CLASSES = `text-sm text-gray-600 hover:text-gray-900 ${FOCUS_CLASSES}`;
+
+// Footer section data structure for DRY principle
+const FOOTER_SECTIONS = [
+  {
+    key: 'company',
+    links: [
+      { href: '/about', key: 'about' },
+      { href: '/contact', key: 'contact' }
+    ]
+  },
+  {
+    key: 'support',
+    links: [
+      { href: '/help', key: 'help' },
+      { href: '/faq', key: 'faq' }
+    ]
+  },
+  {
+    key: 'legal',
+    links: [
+      { href: '/privacy', key: 'privacy' },
+      { href: '/terms', key: 'terms' }
+    ]
+  }
+] as const;
+
+function FooterSection({ sectionKey, links, t }: { 
+  sectionKey: string; 
+  links: readonly { href: string; key: string }[];
+  t: (key: string) => string;
+}) {
+  return (
+    <div>
+      <h3 className="font-semibold text-gray-900 mb-2">
+        {t(`footer.${sectionKey}`)}
+      </h3>
+      <ul className="space-y-1">
+        {links.map(({ href, key }) => (
+          <li key={key}>
+            <Link href={href} className={FOOTER_LINK_CLASSES}>
+              {t(`footer.${key}`)}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function AppShell({ children }: AppShellProps) {
   const { language, toggleLanguage, t } = useLanguage();
 
@@ -23,7 +75,7 @@ export function AppShell({ children }: AppShellProps) {
             {/* Logo */}
             <Link 
               href="/" 
-              className="font-bold text-xl text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+              className={`font-bold text-xl text-gray-900 ${FOCUS_CLASSES}`}
               aria-label={t('common.home')}
             >
               Motor Insurance MY
@@ -34,9 +86,10 @@ export function AppShell({ children }: AppShellProps) {
               {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                className={`px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors ${FOCUS_CLASSES}`}
                 aria-label={t('common.changeLanguage')}
                 aria-pressed={language === 'en' ? 'true' : 'false'}
+                type="button"
               >
                 {language === 'en' ? 'BM' : 'EN'}
               </button>
@@ -44,7 +97,7 @@ export function AppShell({ children }: AppShellProps) {
               {/* Sign In Link */}
               <Link
                 href="/signin"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                className={`text-sm font-medium text-gray-700 hover:text-gray-900 ${FOCUS_CLASSES}`}
               >
                 {t('common.signIn')}
               </Link>
@@ -65,56 +118,14 @@ export function AppShell({ children }: AppShellProps) {
       >
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Company Info */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">{t('footer.company')}</h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/about" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.about')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.contact')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">{t('footer.support')}</h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/help" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.help')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.faq')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">{t('footer.legal')}</h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.privacy')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
-                    {t('footer.terms')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            {FOOTER_SECTIONS.map(({ key, links }) => (
+              <FooterSection 
+                key={key}
+                sectionKey={key}
+                links={links}
+                t={t}
+              />
+            ))}
           </div>
 
           {/* Copyright */}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { TextField } from '@/components/forms/TextField';
+import { Button } from '@/components/common/Button';
 import { StepHeader } from '@/components/layout/StepHeader';
 import { StickyCTA } from '@/components/layout/StickyCTA';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -40,7 +41,7 @@ export default function PostcodePage() {
     delay: 500,
   });
 
-  const validatePostcode = (value: string): boolean => {
+  const validatePostcode = useCallback((value: string): boolean => {
     if (!value) {
       setError(t('quote.postcode.error.required'));
       return false;
@@ -51,7 +52,7 @@ export default function PostcodePage() {
     }
     setError('');
     return true;
-  };
+  }, [t]);
 
   const handlePostcodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 5);
@@ -61,8 +62,8 @@ export default function PostcodePage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+    e?.preventDefault();
     
     if (!validatePostcode(postcode)) {
       return;
@@ -84,9 +85,10 @@ export default function PostcodePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [postcode, router, validatePostcode]);
 
   const isValid = postcode.length === 5 && !error;
+  const buttonText = isLoading ? t('common.loading') : t('common.continue');
 
   return (
     <>
@@ -115,40 +117,28 @@ export default function PostcodePage() {
 
           {/* Desktop Continue Button */}
           <div className="hidden md:block">
-            <button
+            <Button
               type="submit"
-              disabled={!isValid || isLoading}
-              className={`
-                w-full px-6 py-3 text-base font-semibold rounded-lg
-                transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                ${isValid && !isLoading
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }
-              `}
+              disabled={!isValid}
+              isLoading={isLoading}
+              className="w-full"
             >
-              {isLoading ? t('common.loading') : t('common.continue')}
-            </button>
+              {buttonText}
+            </Button>
           </div>
         </form>
       </div>
 
       {/* Mobile Sticky CTA */}
       <StickyCTA>
-        <button
-          onClick={handleSubmit}
-          disabled={!isValid || isLoading}
-          className={`
-            w-full px-6 py-3 text-base font-semibold rounded-lg
-            transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-            ${isValid && !isLoading
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }
-          `}
+        <Button
+          onClick={() => handleSubmit()}
+          disabled={!isValid}
+          isLoading={isLoading}
+          className="w-full"
         >
-          {isLoading ? t('common.loading') : t('common.continue')}
-        </button>
+          {buttonText}
+        </Button>
       </StickyCTA>
     </>
   );
