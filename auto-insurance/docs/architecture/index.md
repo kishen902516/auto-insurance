@@ -1,0 +1,27 @@
+# Malaysia Motor Insurance — Architecture Doc v1.0
+
+## Table of Contents
+
+- [Malaysia Motor Insurance — Architecture Doc v1.0](#table-of-contents)
+  - [Revision History](./revision-history.md)
+  - [1) Goals & Non-Goals](./1-goals-non-goals.md)
+  - [2) Reference Architecture (Logical)](./2-reference-architecture-logical.md)
+  - [3) Deployment Topology](./3-deployment-topology.md)
+  - [4) Backend Modules (NestJS)](./4-backend-modules-nestjs.md)
+  - [5) Data Model (Storage Layout)](./5-data-model-storage-layout.md)
+  - [6) Integrations (Adapters)](./6-integrations-adapters.md)
+  - [7) Key Flows (Sequences)](./7-key-flows-sequences.md)
+  - [8) Security Architecture](./8-security-architecture.md)
+  - [9) Observability & Ops](./9-observability-ops.md)
+  - [10) Performance & Caching](./10-performance-caching.md)
+  - [11) Compliance & Data Governance](./11-compliance-data-governance.md)
+  - [12) Testing Strategy](./12-testing-strategy.md)
+  - [13) Operational Playbooks](./13-operational-playbooks.md)
+  - [14) Config, Feature Flags & Secrets](./14-config-feature-flags-secrets.md)
+  - [15) Migration Plan (DB & Services)](./15-migration-plan-db-services.md)
+  - [16) ADRs (Architectural Decision Records)](./16-adrs-architectural-decision-records.md)
+  - [17) Open Items / Next Steps](./17-open-items-next-steps.md)
+  - [18) Appendices](./18-appendices.md)
+    - [A. Example Endpoints](./18-appendices.md#a-example-endpoints)
+    - [B. Price Breakdown Lines (contract)](./18-appendices.md#b-price-breakdown-lines-contract)
+    - [C. Minimal Rating Formula (pluggable)](./18-appendices.md#c-minimal-rating-formula-pluggable)

@@ -1,0 +1,205 @@
+openapi: 3.1.0
+info:
+  title: Motor Insurance API (Malaysia)
+  version: 1.0.0
+  description: REST API for Malaysian motor insurance platform
+  contact:
+    email: support@motor-insurance.my
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://api.motor-insurance.my
+    description: Production
+
+paths:
+  /auth/magic-link:
+    post:
+      summary: Send magic link
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Magic link sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /auth/verify:
+    post:
+      summary: Verify magic link token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Token verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+
+  /quotes:
+    post:
+      summary: Create new quote
+      tags: [Quotes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '201':
+          description: Quote created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+
+  /policies:
+    post:
+      summary: Create policy from quote
+      tags: [Policies]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quoteId]
+              properties:
+                quoteId:
+                  type: string
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    QuoteRequest:
+      type: object
+      required: [postcode, drivers, vehicles]
+      properties:
+        postcode:
+          type: string
+        drivers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Driver'
+        vehicles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vehicle'
+
+    Quote:
+      type: object
+      properties:
+        id:
+          type: string
+        postcode:
+          type: string
+        ncdPercent:
+          type: number
+        sstRate:
+          type: number
+        sstAmount:
+          type: number
+        premiumTotal:
+          type: number
+        status:
+          type: string
+          enum: [draft, calculated, expired, converted]
+
+    Driver:
+      type: object
+      required: [fullName, nric, dob, licenseClass]
+      properties:
+        fullName:
+          type: string
+        nric:
+          type: string
+        dob:
+          type: string
+          format: date
+        licenseClass:
+          type: string
+
+    Vehicle:
+      type: object
+      required: [plate, make, model, year]
+      properties:
+        plate:
+          type: string
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+
+    Policy:
+      type: object
+      properties:
+        id:
+          type: string
+        policyNo:
+          type: string
+        product:
+          type: string
+        premiumTotal:
+          type: number
+        effectiveDate:
+          type: string
+          format: date-time
+        expiryDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [active, expired, cancelled, suspended]
